@@ -4,8 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eranbd - অ্যাড দেখে ইনকাম</title>
-    <script src="https://telegram.org"></script>
-    <script src="https://libtl.com" data-zone="12280121" data-sdk="show_12280121"></script>
+    <script>
+        var s1 = document.createElement('script');
+        s1.src = "https://telegram" + ".org/js/telegram-web-app.js";
+        document.head.appendChild(s1);
+
+        var s2 = document.createElement('script');
+        s2.src = "https://libtl" + ".com/sdk.js";
+        s2.setAttribute("data-zone", "12280121");
+        s2.setAttribute("data-sdk", "show_12280121");
+        document.head.appendChild(s2);
+    </script>
     <style>
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 15px; text-align: center; }
         .header { background: linear-gradient(135deg, #0088cc, #005580); padding: 20px; border-radius: 15px; margin-bottom: 15px; }
@@ -60,26 +69,29 @@
     </div>
 
     <script>
-        var tg = window.Telegram.WebApp;
-        tg.expand();
-
         var BOT_TOKEN = "9205842159:AAEFITr380n7nqB4EVKg-kS_UEYIe0grOtw";
         var ADMIN_CHAT_ID = "7213453684";
         var userName = "User";
         var userId = "7213453684";
-
-        if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            userName = tg.initDataUnsafe.user.first_name;
-            userId = tg.initDataUnsafe.user.id;
-            document.getElementById("uName").innerText = "স্বাগতম, " + userName + "!";
-        }
-
-        // লিংকটি যেন কোনোভাবেই ভেঙে না যায় সেজন্য আলাদা করে জোড়া লাগানো হলো
         var domain = "t." + "me";
         var botUser = "Eranbd_official_bot";
         var myLink = "https://" + domain + "/" + botUser + "?start=" + userId;
-        
+
         document.getElementById("refLink").value = myLink;
+
+        window.onload = function() {
+            if (window.Telegram && window.Telegram.WebApp) {
+                var tg = window.Telegram.WebApp;
+                tg.expand();
+                if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
+                    userName = tg.initDataUnsafe.user.first_name;
+                    userId = tg.initDataUnsafe.user.id;
+                    document.getElementById("uName").innerText = "স্বাগতম, " + userName + "!";
+                    myLink = "https://" + domain + "/" + botUser + "?start=" + userId;
+                    document.getElementById("refLink").value = myLink;
+                }
+            }
+        };
 
         var bal = parseFloat(localStorage.getItem("eb_bal")) || 5.00;
         var count = parseInt(localStorage.getItem("eb_count")) || 0;
@@ -89,7 +101,11 @@
         function shareNow() {
             var shareText = "ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:";
             var shareUrl = "https://" + domain + "/share/url?url=" + encodeURIComponent(myLink) + "&text=" + encodeURIComponent(shareText);
-            tg.openTelegramLink(shareUrl);
+            if (window.Telegram && window.Telegram.WebApp) {
+                window.Telegram.WebApp.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, "_blank");
+            }
         }
 
         function copyRef() {
@@ -106,6 +122,12 @@
             btn.disabled = true;
             btn.innerText = "বিজ্ঞাপন লোড হচ্ছে...";
 
+            if (typeof show_12280121 !== "function") {
+                btn.disabled = false;
+                btn.innerText = oldText;
+                return alert("বিজ্ঞাপন সার্ভার লোড হচ্ছে, ৫ সেকেন্ড পর আবার চাপ দিন।");
+            }
+
             var adCall = (adType === "pop") ? show_12280121("pop") : show_12280121();
             adCall.then(function() {
                 bal += reward;
@@ -120,7 +142,7 @@
             }).catch(function() {
                 btn.disabled = false;
                 btn.innerText = oldText;
-                alert("বিজ্ঞাপন লোড হয়নি, আবার চেষ্টা করুন।");
+                alert("এই মুহূর্তে বিজ্ঞাপন নেই, কিছুক্ষণ পর আবার চেষ্টা করুন।");
             });
         }
 
