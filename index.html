@@ -44,7 +44,7 @@
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" readonly>
+        <input type="text" id="refLink" value="https://t.me" readonly>
         <button class="btn btn-orange" onclick="shareRef()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
@@ -66,11 +66,10 @@
 
         const BOT_TOKEN = "9205842159:AAEFITr380n7nqB4EVKg-kS_UEYIe0grOtw"; 
         const ADMIN_CHAT_ID = "7213453684";
-        const BOT_USERNAME = "Eranbd_official_bot";
 
         let userName = "Unknown User";
-        let userId = "guest_" + Math.floor(Math.random() * 100000);
-        let referredBy = localStorage.getItem('eb_ref_by') || "Direct (None)";
+        let userId = "7213453684";
+        let referredBy = localStorage.getItem('eb_ref_by') || "Direct";
 
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
             const u = tg.initDataUnsafe.user;
@@ -79,7 +78,7 @@
             document.getElementById('uName').innerText = "স্বাগতম, " + u.first_name + "!";
         }
 
-        const myRefLink = "https://" + "t.me/" + BOT_USERNAME + "?start=" + userId;
+        const myRefLink = "https://t.me?start=" + userId;
         document.getElementById('refLink').value = myRefLink;
 
         let isFirstTime = !localStorage.getItem('eb_joined');
@@ -97,7 +96,7 @@
             localStorage.setItem('eb_bal', initialBonus);
         }
 
-        if (referredBy !== "Direct (None)") {
+        if (referredBy !== "Direct") {
             const refBadge = document.getElementById('refInfo');
             refBadge.style.display = "block";
             refBadge.innerText = "রেফারার আইডি: " + referredBy;
@@ -119,12 +118,12 @@
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            alert("✅ আপনার রেফার লিংক কপি হয়েছে: " + copyText.value);
+            alert("✅ রেফার লিংক কপি হয়েছে:\n" + copyText.value);
         }
 
         function shareRef() {
             const shareText = "🚀 ঘরে বসে মোবাইল দিয়ে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! আমার লিংক থেকে জয়েন করলেই পাবেন ৳১০ বোনাস:";
-            const shareUrl = "https://" + "t.me/share/url?url=" + encodeURIComponent(myRefLink) + "&text=" + encodeURIComponent(shareText);
+            const shareUrl = "https://t.me" + encodeURIComponent(myRefLink) + "&text=" + encodeURIComponent(shareText);
             tg.openTelegramLink(shareUrl);
         }
 
