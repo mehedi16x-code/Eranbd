@@ -1,1 +1,70 @@
 
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Eranbd - অ্যাড দেখে ইনকাম</title>
+    <script src="https://telegram.org"></script>
+    <style>
+        body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 15px; text-align: center; }
+        .header { background: #0088cc; padding: 20px; border-radius: 15px; margin-bottom: 15px; }
+        .box { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
+        .bal { font-size: 30px; font-weight: bold; color: #00e676; }
+        .btn { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 10px; }
+        .btn:disabled { background: #555; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: white; box-sizing: border-box; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>🚀 Eranbd</h2>
+        <p id="uName">স্বাগতম!</p>
+    </div>
+    <div class="box">
+        <div>আপনার ব্যালেন্স</div>
+        <div class="bal">৳ <span id="bal">5.00</span></div>
+    </div>
+    <div class="box">
+        <h3>📺 বিজ্ঞাপন দেখুন</h3>
+        <button class="btn" id="ad1" onclick="watchAd(1, 2)">অ্যাড ১ দেখুন (+৳২.০০)</button>
+        <button class="btn" id="ad2" onclick="watchAd(2, 1.5)">অ্যাড ২ দেখুন (+৳১.৫০)</button>
+    </div>
+    <div class="box">
+        <h3>💸 টাকা তুলুন (সর্বনিম্ন ৳৫০)</h3>
+        <select id="method"><option>bKash</option><option>Nagad</option></select>
+        <input type="number" id="num" placeholder="বিকাশ বা নগদ নাম্বার">
+        <input type="number" id="amt" placeholder="টাকার পরিমাণ">
+        <button class="btn" style="background:#00c853;" onclick="withdraw()">টাকা তুলুন</button>
+    </div>
+    <script>
+        const tg = window.Telegram.WebApp; tg.expand();
+        if (tg.initDataUnsafe?.user) document.getElementById('uName').innerText = "স্বাগতম, " + tg.initDataUnsafe.user.first_name;
+        let bal = parseFloat(localStorage.getItem('eb_bal')) || 5.00;
+        document.getElementById('bal').innerText = bal.toFixed(2);
+        function watchAd(id, rew) {
+            let btn = document.getElementById('ad' + id); btn.disabled = true;
+            window.open('https://google.com', '_blank');
+            let t = 10;
+            let timer = setInterval(() => {
+                t--; btn.innerText = "অপেক্ষা করুন (" + t + " সেকেন্ড)";
+                if (t <= 0) {
+                    clearInterval(timer); bal += rew;
+                    localStorage.setItem('eb_bal', bal);
+                    document.getElementById('bal').innerText = bal.toFixed(2);
+                    btn.disabled = false; btn.innerText = "আবার দেখুন (+৳" + rew + ")";
+                    alert("৳" + rew + " যোগ হয়েছে!");
+                }
+            }, 1000);
+        }
+        function withdraw() {
+            let num = document.getElementById('num').value;
+            let amt = parseFloat(document.getElementById('amt').value);
+            if (num.length < 11 || isNaN(amt) || amt < 50 || amt > bal) return alert("সঠিক নাম্বার ও পর্যাপ্ত ব্যালেন্স দিন!");
+            bal -= amt; localStorage.setItem('eb_bal', bal);
+            document.getElementById('bal').innerText = bal.toFixed(2);
+            alert("উইথড্র রিকোয়েস্ট সফল হয়েছে!");
+        }
+    </script>
+</body>
+</html>
