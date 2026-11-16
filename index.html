@@ -17,7 +17,7 @@
         .btn-purple { background: #6200ea; }
         .btn-green { background: #00c853; }
         .btn-orange { background: #ff6d00; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: #00e676; box-sizing: border-box; text-align: center; font-size: 14px; font-weight: bold; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: #00e676; box-sizing: border-box; text-align: center; font-size: 13px; font-weight: bold; }
         input[type="number"] { color: white; font-weight: normal; }
     </style>
 </head>
@@ -43,7 +43,7 @@
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" value="https://eranbd.com" readonly>
+        <input type="text" id="refLink" value="t.me/Eranbd_official_bot" readonly>
         <button class="btn btn-orange" onclick="shareRef()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
@@ -72,8 +72,10 @@
             userName = tg.initDataUnsafe.user.first_name;
             userId = tg.initDataUnsafe.user.id;
             document.getElementById("uName").innerText = "স্বাগতম, " + userName + "!";
-            document.getElementById("refLink").value = "https://eranbd.com" + userId;
         }
+
+        var fullBotLink = "https:" + String.fromCharCode(47, 47) + "t.me/Eranbd_official_bot?start=" + userId;
+        document.getElementById("refLink").value = fullBotLink;
 
         var bal = parseFloat(localStorage.getItem("eb_bal")) || 5.00;
         var count = parseInt(localStorage.getItem("eb_count")) || 0;
@@ -88,9 +90,9 @@
         }
 
         function shareRef() {
-            var botLink = "https://t.me" + userId;
             var text = "ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:";
-            tg.openTelegramLink("https://t.me" + encodeURIComponent(botLink) + "&text=" + encodeURIComponent(text));
+            var shareBase = "https:" + String.fromCharCode(47, 47) + "t.me/share/url";
+            tg.openTelegramLink(shareBase + "?url=" + encodeURIComponent(fullBotLink) + "&text=" + encodeURIComponent(text));
         }
 
         function watchRealAd(btnId, reward, adType) {
@@ -125,7 +127,8 @@
                 return alert("সঠিক নাম্বার ও পর্যাপ্ত ব্যালেন্স দিন!");
             }
             var msg = "নতুন পেমেন্ট রিকোয়েস্ট (Eranbd)\nইউজার: " + userName + " (" + userId + ")\nমাধ্যম: " + method + "\nনাম্বার: " + num + "\nটাকা: ৳" + amt;
-            var url = "https://telegram.org" + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
+            var apiBase = "https:" + String.fromCharCode(47, 47) + "api.telegram.org/bot";
+            var url = apiBase + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
             fetch(url).then(function(r) { return r.json(); }).then(function(d) {
                 if (d.ok) {
                     bal -= amt;
