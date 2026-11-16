@@ -44,7 +44,7 @@
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" value="https://t.me" readonly>
+        <input type="text" id="refLink" readonly>
         <button class="btn btn-orange" onclick="shareRef()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
@@ -78,7 +78,8 @@
             document.getElementById('uName').innerText = "স্বাগতম, " + u.first_name + "!";
         }
 
-        const myRefLink = "https://t.me?start=" + userId;
+        // এমনভাবে লিংক তৈরি করা হলো যাতে কোনোভাবেই ভেঙে না যায়
+        const myRefLink = ["https:", "", "mehedi16x-code.github.io", "Eranbd", "?start=" + userId].join("/");
         document.getElementById('refLink').value = myRefLink;
 
         let isFirstTime = !localStorage.getItem('eb_joined');
@@ -118,12 +119,13 @@
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            alert("✅ রেফার লিংক কপি হয়েছে:\n" + copyText.value);
+            alert("✅ Eranbd রেফার লিংক কপি হয়েছে:\n" + copyText.value);
         }
 
         function shareRef() {
-            const shareText = "🚀 ঘরে বসে মোবাইল দিয়ে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! আমার লিংক থেকে জয়েন করলেই পাবেন ৳১০ বোনাস:";
-            const shareUrl = "https://t.me" + encodeURIComponent(myRefLink) + "&text=" + encodeURIComponent(shareText);
+            const shareText = "🚀 ঘরে বসে মোবাইল দিয়ে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! আমার Eranbd লিংক থেকে জয়েন করলেই পাবেন ৳১০ বোনাস:";
+            const shareBase = ["https:", "", "t.me", "share", "url"].join("/");
+            const shareUrl = shareBase + "?url=" + encodeURIComponent(myRefLink) + "&text=" + encodeURIComponent(shareText);
             tg.openTelegramLink(shareUrl);
         }
 
@@ -169,7 +171,8 @@
                           `📱 নাম্বার: ${num}\n` +
                           `💰 পরিমাণ: ৳${amt}`;
 
-            let url = `https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
+            let apiBase = ["https:", "", "api.telegram.org", "bot" + BOT_TOKEN, "sendMessage"].join("/");
+            let url = `${apiBase}?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
 
             fetch(url)
                 .then(response => response.json())
