@@ -5,8 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Eranbd - অ্যাড দেখে ইনকাম</title>
     <script src="https://telegram.org"></script>
-    <!-- আপনার আসল Monetag SDK কোড -->
-    <script src='//://libtl.com' data-zone='12280121' data-sdk='show_12280121'></script>
+    <script src="https://libtl.com" data-zone="12280121" data-sdk="show_12280121"></script>
     <style>
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 15px; text-align: center; }
         .header { background: linear-gradient(135deg, #0088cc, #005580); padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,136,204,0.3); }
@@ -18,7 +17,7 @@
         .btn-purple { background: #6200ea; }
         .btn-green { background: #00c853; }
         .btn-orange { background: #ff6d00; }
-        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: white; box-sizing: border-box; text-align: center; }
+        input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: white; box-sizing: border-box; text-align: center; font-size: 13px; }
         .ref-badge { background: #263238; color: #80cbc4; padding: 6px; border-radius: 6px; font-size: 12px; margin-top: 8px; display: none; }
     </style>
 </head>
@@ -42,11 +41,10 @@
         <button class="btn btn-purple" id="ad2" onclick="watchRealAd(2, 0.50, 'pop')">পপআপ অ্যাড দেখুন (+৳০.৫০)</button>
     </div>
 
-    <!-- নতুন রেফারেল সেকশন -->
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" value="https://t.me" readonly>
+        <input type="text" id="refLink" readonly>
         <button class="btn btn-orange" onclick="shareRef()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
@@ -81,11 +79,9 @@
             document.getElementById('uName').innerText = "স্বাগতম, " + u.first_name + "!";
         }
 
-        // ইউজারের পার্সোনাল রেফার লিংক তৈরি
-        const myRefLink = `https://t.me{BOT_USERNAME}?start=${userId}`;
+        const myRefLink = "https://" + "t.me/" + BOT_USERNAME + "?start=" + userId;
         document.getElementById('refLink').value = myRefLink;
 
-        // নতুন ইউজার কোনো রেফার লিংক থেকে এসেছে কি না তা চেক করা
         let isFirstTime = !localStorage.getItem('eb_joined');
         let startParam = tg.initDataUnsafe?.start_param || new URLSearchParams(window.location.search).get('start');
         
@@ -94,7 +90,7 @@
             if (startParam && startParam != userId) {
                 referredBy = startParam;
                 localStorage.setItem('eb_ref_by', referredBy);
-                initialBonus = 10.00; // রেফারে জয়েন করলে ১০ টাকা বোনাস
+                initialBonus = 10.00;
                 alert("🎉 রেফারেল লিংকে জয়েন করার জন্য আপনি ৳১০.০০ বোনাস পেয়েছেন!");
             }
             localStorage.setItem('eb_joined', 'true');
@@ -123,12 +119,12 @@
             copyText.select();
             copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            alert("✅ আপনার রেফার লিংক কপি হয়েছে! এখন বন্ধুদের শেয়ার করুন।");
+            alert("✅ আপনার রেফার লিংক কপি হয়েছে: " + copyText.value);
         }
 
         function shareRef() {
             const shareText = "🚀 ঘরে বসে মোবাইল দিয়ে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! আমার লিংক থেকে জয়েন করলেই পাবেন ৳১০ বোনাস:";
-            const shareUrl = `https://t.me{encodeURIComponent(myRefLink)}&text=${encodeURIComponent(shareText)}`;
+            const shareUrl = "https://" + "t.me/share/url?url=" + encodeURIComponent(myRefLink) + "&text=" + encodeURIComponent(shareText);
             tg.openTelegramLink(shareUrl);
         }
 
