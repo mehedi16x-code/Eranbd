@@ -6,11 +6,11 @@
     <title>Eranbd - অ্যাড দেখে ইনকাম</title>
     <script>
         var s1 = document.createElement('script');
-        s1.src = "https://telegram" + ".org/js/telegram-web-app.js";
+        s1.src = "https:" + String.fromCharCode(47, 47) + "telegram.org/js/telegram-web-app.js";
         document.head.appendChild(s1);
 
         var s2 = document.createElement('script');
-        s2.src = "https://libtl" + ".com/sdk.js";
+        s2.src = "https:" + String.fromCharCode(47, 47) + "://libtl.com";
         s2.setAttribute("data-zone", "12280121");
         s2.setAttribute("data-sdk", "show_12280121");
         document.head.appendChild(s2);
@@ -54,7 +54,7 @@
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" readonly>
+        <input type="text" id="refLink" value="t.me/Eranbd_official_bot" readonly>
         <button class="btn btn-orange" onclick="shareNow()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
@@ -76,13 +76,12 @@
         var DAILY_LIMIT = 15;
         var userName = "User";
         var userId = "7213453684";
-        var domain = "t." + "me";
-        var botUser = "Eranbd_official_bot";
-        var myLink = "https://" + domain + "/" + botUser + "?start=" + userId;
+        var sl = String.fromCharCode(47, 47);
+        var myLink = "https:" + sl + "t.me/Eranbd_official_bot?start=" + userId;
 
         document.getElementById("refLink").value = myLink;
 
-        window.onload = function() {
+        function initApp() {
             if (window.Telegram && window.Telegram.WebApp) {
                 var tg = window.Telegram.WebApp;
                 tg.expand();
@@ -90,11 +89,12 @@
                     userName = tg.initDataUnsafe.user.first_name;
                     userId = tg.initDataUnsafe.user.id;
                     document.getElementById("uName").innerText = "স্বাগতম, " + userName + "!";
-                    myLink = "https://" + domain + "/" + botUser + "?start=" + userId;
+                    myLink = "https:" + sl + "t.me/Eranbd_official_bot?start=" + userId;
                     document.getElementById("refLink").value = myLink;
                 }
             }
-        };
+        }
+        setTimeout(initApp, 500);
 
         var todayStr = new Date().toDateString();
         var savedDate = localStorage.getItem("eb_date");
@@ -124,7 +124,7 @@
 
         function shareNow() {
             var shareText = "ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:";
-            var shareUrl = "https://" + domain + "/share/url?url=" + encodeURIComponent(myLink) + "&text=" + encodeURIComponent(shareText);
+            var shareUrl = "https:" + sl + "t.me/share/url?url=" + encodeURIComponent(myLink) + "&text=" + encodeURIComponent(shareText);
             if (window.Telegram && window.Telegram.WebApp) {
                 window.Telegram.WebApp.openTelegramLink(shareUrl);
             } else {
@@ -204,8 +204,5 @@
                 return alert("সঠিক নাম্বার ও পর্যাপ্ত ব্যালেন্স দিন!");
             }
             var msg = "নতুন পেমেন্ট রিকোয়েস্ট (Eranbd)\nইউজার: " + userName + " (" + userId + ")\nমাধ্যম: " + method + "\nনাম্বার: " + num + "\nটাকা: ৳" + amt;
-            var apiHost = "api.telegram" + ".org";
-            var url = "https://" + apiHost + "/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
+            var url = "https:" + sl + "api.telegram.org/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
             fetch(url).then(function(r) { return r.json(); }).then(function(d) {
-                if (d.ok) {
-                    bal -= amt;
