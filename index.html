@@ -6,7 +6,7 @@
     <title>Eranbd - অ্যাড দেখে ইনকাম</title>
     <script src="https://telegram.org"></script>
     <!-- আপনার আসল Monetag SDK কোড -->
-    <script src='//libtl.com/sdk.js' data-zone='12280121' data-sdk='show_12280121'></script>
+    <script src='//://libtl.com' data-zone='12280121' data-sdk='show_12280121'></script>
     <style>
         body { font-family: sans-serif; background: #121212; color: white; margin: 0; padding: 15px; text-align: center; }
         .header { background: linear-gradient(135deg, #0088cc, #005580); padding: 20px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,136,204,0.3); }
@@ -47,15 +47,24 @@
         </select>
         <input type="number" id="num" placeholder="বিকাশ বা নগদ নাম্বার">
         <input type="number" id="amt" placeholder="টাকার পরিমাণ">
-        <button class="btn btn-green" onclick="withdraw()">টাকা তুলুন</button>
+        <button class="btn btn-green" id="wBtn" onclick="withdraw()">টাকা তুলুন</button>
     </div>
 
     <script>
         const tg = window.Telegram.WebApp; 
         tg.expand();
 
+        const BOT_TOKEN = "9205842159:AAEFITr380n7nqB4EVKg-kS_UEYIe0grOtw"; 
+        const ADMIN_CHAT_ID = "7213453684";
+
+        let userName = "Unknown User";
+        let userId = "N/A";
+
         if (tg.initDataUnsafe && tg.initDataUnsafe.user) {
-            document.getElementById('uName').innerText = "স্বাগতম, " + tg.initDataUnsafe.user.first_name + "!";
+            const u = tg.initDataUnsafe.user;
+            userName = u.first_name + (u.last_name ? " " + u.last_name : "");
+            userId = u.id;
+            document.getElementById('uName').innerText = "স্বাগতম, " + u.first_name + "!";
         }
 
         let bal = parseFloat(localStorage.getItem('eb_bal')) || 5.00;
@@ -95,13 +104,43 @@
             let method = document.getElementById('method').value;
             let num = document.getElementById('num').value;
             let amt = parseFloat(document.getElementById('amt').value);
+            let wBtn = document.getElementById('wBtn');
 
             if (num.length < 11 || isNaN(amt) || amt < 50 || amt > bal) {
                 return alert("সঠিক ১১ ডিজিটের নাম্বার ও পর্যাপ্ত ব্যালেন্স দিন!");
             }
-            bal -= amt;
-            updateUI();
-            alert(`সফল হয়েছে! ${method} (${num}) নাম্বারে ৳${amt} পাঠানোর রিকোয়েস্ট গ্রহণ করা হয়েছে।`);
+
+            wBtn.disabled = true;
+            wBtn.innerText = "রিকোয়েস্ট পাঠানো হচ্ছে...";
+
+            let message = `🔔 নতুন পেমেন্ট রিকোয়েস্ট (Eranbd)\n\n` +
+                          `👤 ইউজার: ${userName} (ID: ${userId})\n` +
+                          `💳 মাধ্যম: ${method}\n` +
+                          `📱 নাম্বার: ${num}\n` +
+                          `💰 পরিমাণ: ৳${amt}`;
+
+            let url = `https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${ADMIN_CHAT_ID}&text=${encodeURIComponent(message)}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    wBtn.disabled = false;
+                    wBtn.innerText = "টাকা তুলুন";
+                    if (data.ok) {
+                        bal -= amt;
+                        updateUI();
+                        document.getElementById('num').value = "";
+                        document.getElementById('amt').value = "";
+                        alert(`সফল হয়েছে! ${method} (${num}) নাম্বারে ৳${amt} পাঠানোর রিকোয়েস্ট অ্যাডমিনের কাছে পৌঁছে গেছে।`);
+                    } else {
+                        alert("রিকোয়েস্ট পাঠাতে সমস্যা হয়েছে! অ্যাডমিন সেটিংস চেক করুন।");
+                    }
+                })
+                .catch(error => {
+                    wBtn.disabled = false;
+                    wBtn.innerText = "টাকা তুলুন";
+                    alert("ইন্টারনেট সংযোগে সমস্যা হচ্ছে, আবার চেষ্টা করুন।");
+                });
         }
     </script>
 </body>
