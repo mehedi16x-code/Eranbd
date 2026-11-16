@@ -12,7 +12,7 @@
         .header h2 { margin: 0; font-size: 24px; }
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .bal { font-size: 32px; font-weight: bold; color: #00e676; margin: 5px 0; }
-        .btn { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 10px; display: block; text-decoration: none; box-sizing: border-box; cursor: pointer; }
+        .btn { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; }
         .btn:disabled { background: #555; }
         .btn-purple { background: #6200ea; }
         .btn-green { background: #00c853; }
@@ -43,8 +43,8 @@
     <div class="box">
         <h3>🤝 বন্ধুদের রেফার করুন</h3>
         <p style="font-size: 13px; color: #ccc; margin: 5px 0;">আপনার লিংক থেকে বন্ধুরা জয়েন করলে তারা পাবে ৳১০ বোনাস এবং আপনি পাবেন রেফারেল কমিশন!</p>
-        <input type="text" id="refLink" value="https://t.me" readonly>
-        <a id="shareBtn" href="https://t.mehttps://t.me&text=ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন!" class="btn btn-orange">📤 টেলিগ্রামে শেয়ার করুন</a>
+        <input type="text" id="refLink" readonly>
+        <button class="btn btn-orange" onclick="shareNow()">📤 টেলিগ্রামে শেয়ার করুন</button>
         <button class="btn" style="background: #37474f;" onclick="copyRef()">📋 রেফার লিংক কপি করুন</button>
     </div>
 
@@ -72,15 +72,25 @@
             userName = tg.initDataUnsafe.user.first_name;
             userId = tg.initDataUnsafe.user.id;
             document.getElementById("uName").innerText = "স্বাগতম, " + userName + "!";
-            var myLink = "https://t.me" + userId;
-            document.getElementById("refLink").value = myLink;
-            document.getElementById("shareBtn").href = "https://t.me" + encodeURIComponent(myLink) + "&text=" + encodeURIComponent("ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:");
         }
+
+        // লিংকটি যেন কোনোভাবেই ভেঙে না যায় সেজন্য আলাদা করে জোড়া লাগানো হলো
+        var domain = "t." + "me";
+        var botUser = "Eranbd_official_bot";
+        var myLink = "https://" + domain + "/" + botUser + "?start=" + userId;
+        
+        document.getElementById("refLink").value = myLink;
 
         var bal = parseFloat(localStorage.getItem("eb_bal")) || 5.00;
         var count = parseInt(localStorage.getItem("eb_count")) || 0;
         document.getElementById("bal").innerText = bal.toFixed(2);
         document.getElementById("adCount").innerText = count;
+
+        function shareNow() {
+            var shareText = "ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:";
+            var shareUrl = "https://" + domain + "/share/url?url=" + encodeURIComponent(myLink) + "&text=" + encodeURIComponent(shareText);
+            tg.openTelegramLink(shareUrl);
+        }
 
         function copyRef() {
             var copyText = document.getElementById("refLink");
@@ -122,7 +132,8 @@
                 return alert("সঠিক নাম্বার ও পর্যাপ্ত ব্যালেন্স দিন!");
             }
             var msg = "নতুন পেমেন্ট রিকোয়েস্ট (Eranbd)\nইউজার: " + userName + " (" + userId + ")\nমাধ্যম: " + method + "\nনাম্বার: " + num + "\nটাকা: ৳" + amt;
-            var url = "https://telegram.org" + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
+            var apiHost = "api.telegram" + ".org";
+            var url = "https://" + apiHost + "/bot" + BOT_TOKEN + "/sendMessage?chat_id=" + ADMIN_CHAT_ID + "&text=" + encodeURIComponent(msg);
             fetch(url).then(function(r) { return r.json(); }).then(function(d) {
                 if (d.ok) {
                     bal -= amt;
