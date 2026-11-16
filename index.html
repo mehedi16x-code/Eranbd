@@ -22,12 +22,13 @@
         .box { background: #1e1e1e; padding: 15px; border-radius: 12px; margin-bottom: 15px; border: 1px solid #333; }
         .bal { font-size: 32px; font-weight: bold; color: #00e676; margin: 5px 0; }
         .btn { width: 100%; padding: 12px; background: #0088cc; color: white; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; margin-top: 10px; cursor: pointer; }
-        .btn:disabled { background: #555; }
+        .btn:disabled { background: #555; cursor: not-allowed; }
         .btn-purple { background: #6200ea; }
         .btn-green { background: #00c853; }
         .btn-orange { background: #ff6d00; }
         input, select { width: 100%; padding: 10px; margin: 8px 0; border-radius: 8px; border: 1px solid #444; background: #2c2c2c; color: #00e676; box-sizing: border-box; text-align: center; font-size: 13px; font-weight: bold; }
         input[type="number"] { color: white; font-weight: normal; }
+        .limit-badge { background: #263238; color: #ffd54f; padding: 6px 12px; border-radius: 20px; font-size: 13px; display: inline-block; margin-top: 8px; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -40,7 +41,8 @@
     <div class="box">
         <div>আপনার বর্তমান ব্যালেন্স</div>
         <div class="bal">৳ <span id="bal">5.00</span></div>
-        <div style="font-size: 13px; color: #aaa;">মোট দেখা অ্যাড: <span id="adCount">0</span> টি</div>
+        <div class="limit-badge">আজকের অ্যাড: <span id="todayCount">0</span> / 15 টি</div>
+        <div style="font-size: 12px; color: #aaa; margin-top: 5px;">সর্বমোট দেখা অ্যাড: <span id="adCount">0</span> টি</div>
     </div>
 
     <div class="box">
@@ -71,6 +73,7 @@
     <script>
         var BOT_TOKEN = "9205842159:AAEFITr380n7nqB4EVKg-kS_UEYIe0grOtw";
         var ADMIN_CHAT_ID = "7213453684";
+        var DAILY_LIMIT = 15;
         var userName = "User";
         var userId = "7213453684";
         var domain = "t." + "me";
@@ -93,10 +96,31 @@
             }
         };
 
+        var todayStr = new Date().toDateString();
+        var savedDate = localStorage.getItem("eb_date");
+        var todayCount = parseInt(localStorage.getItem("eb_today_count")) || 0;
+
+        if (savedDate !== todayStr) {
+            todayCount = 0;
+            localStorage.setItem("eb_date", todayStr);
+            localStorage.setItem("eb_today_count", 0);
+        }
+
         var bal = parseFloat(localStorage.getItem("eb_bal")) || 5.00;
         var count = parseInt(localStorage.getItem("eb_count")) || 0;
-        document.getElementById("bal").innerText = bal.toFixed(2);
-        document.getElementById("adCount").innerText = count;
+        updateStats();
+
+        function updateStats() {
+            document.getElementById("bal").innerText = bal.toFixed(2);
+            document.getElementById("adCount").innerText = count;
+            document.getElementById("todayCount").innerText = todayCount;
+            if (todayCount >= DAILY_LIMIT) {
+                document.getElementById("ad1").disabled = true;
+                document.getElementById("ad2").disabled = true;
+                document.getElementById("ad1").innerText = "আজকের ১৫টি লিমিট শেষ!";
+                document.getElementById("ad2").innerText = "আগামীকাল আবার আসুন";
+            }
+        }
 
         function shareNow() {
             var shareText = "ঘরে বসে বিজ্ঞাপন দেখে প্রতিদিন টাকা আয় করুন! জয়েন করলেই ৳১০ বোনাস:";
@@ -116,7 +140,32 @@
             alert("রেফার লিংক কপি হয়েছে: " + copyText.value);
         }
 
+        function startCooldown() {
+            if (todayCount >= DAILY_LIMIT) return;
+            var b1 = document.getElementById("ad1");
+            var b2 = document.getElementById("ad2");
+            b1.disabled = true;
+            b2.disabled = true;
+            var sec = 15;
+            var timer = setInterval(function() {
+                sec--;
+                b1.innerText = "পরবর্তী অ্যাড (" + sec + " সেকেন্ড)";
+                b2.innerText = "অপেক্ষা করুন (" + sec + " সেকেন্ড)";
+                if (sec <= 0) {
+                    clearInterval(timer);
+                    b1.disabled = false;
+                    b2.disabled = false;
+                    b1.innerText = "ভিডিও অ্যাড দেখুন (+৳১.০০)";
+                    b2.innerText = "পপআপ অ্যাড দেখুন (+৳০.৫০)";
+                }
+            }, 1000);
+        }
+
         function watchRealAd(btnId, reward, adType) {
+            if (todayCount >= DAILY_LIMIT) {
+                return alert("আপনার আজকের ১৫টি বিজ্ঞাপন দেখার লিমিট শেষ হয়েছে! আগামীকাল আবার দেখতে পারবেন।");
+            }
+
             var btn = document.getElementById("ad" + btnId);
             var oldText = btn.innerText;
             btn.disabled = true;
@@ -132,13 +181,14 @@
             adCall.then(function() {
                 bal += reward;
                 count += 1;
+                todayCount += 1;
                 localStorage.setItem("eb_bal", bal);
                 localStorage.setItem("eb_count", count);
-                document.getElementById("bal").innerText = bal.toFixed(2);
-                document.getElementById("adCount").innerText = count;
-                btn.disabled = false;
-                btn.innerText = oldText;
-                alert("অভিনন্দন! ৳" + reward.toFixed(2) + " যোগ হয়েছে।");
+                localStorage.setItem("eb_today_count", todayCount);
+                localStorage.setItem("eb_date", todayStr);
+                updateStats();
+                alert("অভিনন্দন! ৳" + reward.toFixed(2) + " যোগ হয়েছে। (আজকে: " + todayCount + "/15)");
+                startCooldown();
             }).catch(function() {
                 btn.disabled = false;
                 btn.innerText = oldText;
@@ -159,12 +209,3 @@
             fetch(url).then(function(r) { return r.json(); }).then(function(d) {
                 if (d.ok) {
                     bal -= amt;
-                    localStorage.setItem("eb_bal", bal);
-                    document.getElementById("bal").innerText = bal.toFixed(2);
-                    alert("রিকোয়েস্ট সফল হয়েছে!");
-                }
-            });
-        }
-    </script>
-</body>
-</html>
